@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>메이플 훈장 ‘한글의 기운’ 시뮬레이터</title>
+  <style>
+    body { background:#0b1020; color:#e7ebff; font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif; margin:0; }
+    header{padding:14px 18px;display:flex;gap:16px;align-items:center;justify-content:space-between;border-bottom:1px solid #1c274f}
+    .wrap{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 52px)}
+    aside{background:#121a33;padding:16px;border-right:1px solid #1c274f}
+    main{padding:16px}
+    fieldset{border:1px solid #243061;border-radius:12px;padding:12px 12px 10px;margin:0 0 12px}
+    legend{color:#b8c6ff;font-weight:600;padding:0 6px}
+    button{background:#0e1630;color:#e7ebff;border:1px solid #2b3a79;border-radius:10px;padding:8px 10px;cursor:pointer}
+    button:hover{border-color:#3a55c9}
+    .slot{flex:1 1 260px;min-width:240px;background:#0e1630;border:1px solid #243061;border-radius:14px;padding:14px;margin-bottom:12px}
+    .slot h3{margin:0 0 8px;color:#cfe0ff;font-size:14px}
+    .value{font-size:22px;font-weight:700}
+    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3a79;border-radius:999px;padding:6px 10px;cursor:pointer}
+    .pill.lock{border-color:#3a55c9;background:#0f1a3f}
+    details{margin-top:12px}
+    pre{background:#0e1630;border:1px solid #243061;border-radius:10px;padding:8px 10px;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>메이플 훈장 ‘한글의 기운’ 시뮬레이터</h1>
+    <div>총 소모 <span id="cost">0</span></div>
+  </header>
+  <div class="wrap">
+    <aside>
+      <fieldset>
+        <legend>조작</legend>
+        <button id="btnReroll">재설정</button>
+        <button id="btnRandomize">랜덤시작값</button>
+        <button id="btnReset">초기화</button>
+      </fieldset>
+      <fieldset>
+        <legend>목표 세팅</legend>
+        <label for="t1">S1 목표</label>
+        <select id="t1"><option value="">선택</option></select>
+        <label for="t2">S2 목표</label>
+        <select id="t2"><option value="">선택</option></select>
+        <label for="t3">S3 목표</label>
+        <select id="t3"><option value="">선택</option></select>
+        <div class="toolbar" style="margin-top:8px">
+          <button id="btnAuto">자동 진행 (목표 달성까지)</button>
+        </div>
+      </fieldset>
+      <details>
+        <summary>진단 / 테스트 보기</summary>
+        <pre id="testOutput">(아직 실행 전)</pre>
+      </details>
+    </aside>
+    <main>
+      <div class="slot">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>슬롯 1</h3>
+          <div id="lock1" class="pill"><span>잠금</span></div>
+        </div>
+        <div class="value" id="val1">-</div>
+      </div>
+      <div class="slot">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>슬롯 2</h3>
+          <div id="lock2" class="pill"><span>잠금</span></div>
+        </div>
+        <div class="value" id="val2">-</div>
+      </div>
+      <div class="slot">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>슬롯 3</h3>
+          <div id="lock3" class="pill"><span>잠금</span></div>
+        </div>
+        <div class="value" id="val3">-</div>
+      </div>
+    </main>
+  </div>
+  <script>
+    // ===== 데이터: 슬롯별 문구 =====
+    const slot1Options = ["공백","가끔","가디언 엔젤 슬라임의","갑자기","검은마법사의","굉장히","귀엽고","기쁘게","꿈꾸는 자의","나는","나랏말싸미","나를 따르는","나의","난","낮에","내가 바로","내일도","너의","늘","대적자의","더스크의","데미안의","돌의 정령의","동료의","듄켈의","또 하나의","루시드의","리본 돼지의","림보의","매그너스의","메이플 월드의","메이플스토리의","메이플을 잘 아는","모든 순간","몬스터의","미지의","반 레온의","반반의","발드릭스의","발록의","밤에","배고프고","배부르고","벨룸의","블러디퀸의","뿔버섯의","사실 난","새벽에","세계수의","세렌의","세상에서 가장","수줍고","스우의","스포아의","슬라임의","시그너스의","아무것도 안 했는데","아침에","아카이럼의","알고 보니","언제나","예티의","오늘도","왠지 모르게","우리는","우리의","윌의","은근히","이름 모를","이유 없이","일찍","자쿰의","저녁에","전설의","정말","정체 모를","조금","조금은","주황버섯의","지금 바로","지나가던","진힐라의","친구의","카링의","카웅의","칼로스의","파풀라투스의","피에르의","핑크빈의","항상","혼테일의","힐라의","힘세고"];
+
+    const slot2Options = ["각오가 된","감성적인","강력한","강화하는","거침없는","건강한","건설적인","검은 사슬의","고독한","공부하는","괴력의","궁금한","귀여운","긍정적인","기억 속의","길을 잃은","깜찍한","끈끈한","놀고 싶은","놀라운","눈부신","다정한","대단한","독을 뿌리는","되게","따뜻한","똑똑한","뜨거운","마법저항의","매력 있는","맹독의","멈추지 않는","멋진","무시무시한","바쁜","밝은","배고픈","배부른","봉인의","빛나는","사냥하는","새 친구를 찾고 싶은","석화의","섬세한","성실한","성장하는","소중한","슬픈","시비를 거는","신난","신비한","암흑의","야근하는","어린","언데드의","역사적인","오래된","외로운","운동하는","웃음이 많은","월드 베스트","위대한","유명한","익스트림","잊을 수 없는","자유로운","작은","잠든","재빠른","재생하는","전설의","정의로운","제일가는","졸린","주목받는","지나가는","집에 가고 싶은","차가운","찬란한","참지 못하는","최고의","춤을 추는","친절한","퇴근한","튼튼한","평범함","포션을 싫어하는","프리미엄","한가하게 차를 마시는","해맑은","행복한","혼란의","화려한","회피하는","희귀한"];
+
+    const slot3Options = ["(캐릭터명)","강아지","고양이","공격","광부","궁수","귀요미","그림자","기록","기쁨","기사단","기억","기운","길라잡이","꽃","꿈","나","나그네","나무","노바","단풍잎","달","대적자","대학생","데몬","도시","도적","도전","돌의 정령","동료","레벨 업","레전드","레지스탕스","레프","로그아웃","로그인","리본 돼지","마법","마법사","마음","메소레인저","모험","모험가","몬스터","변신술사","별","보물","불꽃","불릿","비밀","빛","뿔버섯","사냥꾼","사람","선생님","세계","순간","슈퍼스타","스타","스포아","슬라임","슬픔","시간","시작","신념","아니마","아이돌","악마","어둠","에르다스","영웅","영혼","예술가","예티","오리","용사","우리","운명","음유시인","의자","의지","이야기","잠수부","전사","전투","점프","존재","주황버섯","직장인","챌린저","철학자","초월자","추억","축복","친구","탐험","태양","평화","표창","핑크빈","학생","한글","해적","행운","헤이스트","활","훈장","희망","힘"];
+
+    // ===== 유틸 =====
+    const $ = (s)=>document.querySelector(s);
+    const byId = (id)=>document.getElementById(id);
+    const costOfLocks = (lc)=>([1,2,4][lc] ?? 4);
+    const randFrom = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+
+    // ===== select 옵션 채우기 =====
+    const t1 = byId('t1');
+    slot1Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t1.appendChild(opt); });
+    const t2 = byId('t2');
+    slot2Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t2.appendChild(opt); });
+    const t3 = byId('t3');
+    slot3Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t3.appendChild(opt); });
+
+    // ===== 상태 =====
+    let val1=null, val2=null, val3=null;
+    let lock1=false, lock2=false, lock3=false;
+    let totalCost=0;
+
+    // ===== 렌더 보조 =====
+    function updateCost(){ byId('cost').textContent = String(totalCost); }
+    function setVal(i, text){ byId(`val${i}`).textContent = text; }
+
+    // ===== 핵심: 재설정 =====
+    function reroll(){
+      const lc = [lock1,lock2,lock3].filter(Boolean).length;
+      const add = costOfLocks(lc);
+      if(!lock1){ val1 = randFrom(slot1Options); setVal(1, val1); }
+      if(!lock2){ val2 = randFrom(slot2Options); setVal(2, val2); }
+      if(!lock3){ val3 = randFrom(slot3Options); setVal(3, val3); }
+      totalCost += add;
+      updateCost();
+    }
+
+    // ===== 이벤트 바인딩 =====
+    byId('btnReroll').onclick = reroll;
+    byId('btnRandomize').onclick = ()=>{ lock1=false; lock2=false; lock3=false; reroll(); };
+    byId('btnReset').onclick = ()=>{
+      totalCost=0; updateCost();
+      setVal(1,'-'); setVal(2,'-'); setVal(3,'-');
+    };
+    byId('lock1').onclick=()=>{ lock1=!lock1; byId('lock1').classList.toggle('lock', lock1); };
+    byId('lock2').onclick=()=>{ lock2=!lock2; byId('lock2').classList.toggle('lock', lock2); };
+    byId('lock3').onclick=()=>{ lock3=!lock3; byId('lock3').classList.toggle('lock', lock3); };
+
+    // ===== 자동 진행: 목표 달성까지 =====
+    function autoToTarget(){
+      const s1 = t1.value, s2 = t2.value, s3 = t3.value;
+      const target = [
+        s1 ? slot1Options[Number(s1)-1] : null,
+        s2 ? slot2Options[Number(s2)-1] : null,
+        s3 ? slot3Options[Number(s3)-1] : null,
+      ];
+      if(target.every(v=>v===null)) { alert('최소 1개 이상 목표를 선택하세요'); return; }
+
+      // 시작값 없으면 한 번 굴림
+      if(byId('val1').textContent==='-' || byId('val2').textContent==='-' || byId('val3').textContent==='-'){
+        lock1=false; lock2=false; lock3=false; reroll();
+      }
+
+      const syncLocks = ()=>{
+        if(target[0]!==null){ lock1 = (val1===target[0]); byId('lock1').classList.toggle('lock', lock1); }
+        if(target[1]!==null){ lock2 = (val2===target[1]); byId('lock2').classList.toggle('lock', lock2); }
+        if(target[2]!==null){ lock3 = (val3===target[2]); byId('lock3').classList.toggle('lock', lock3); }
+      };
+
+      syncLocks();
+      let guard=0;
+      while(true){
+        guard++; if(guard>5_000_000){ alert('가드 트립: 반복 과다'); break; }
+        const done = (
+          (target[0]===null || val1===target[0]) &&
+          (target[1]===null || val2===target[1]) &&
+          (target[2]===null || val3===target[2])
+        );
+        if(done){ alert('목표 조합 달성!'); break; }
+        syncLocks();
+        reroll();
+        syncLocks();
+      }
+    }
+    byId('btnAuto').onclick = autoToTarget;
+
+    // ===== 간단 테스트 (콘솔 + 화면) =====
+    function runTests(){
+      const lines = [];
+      const ok = (name, cond)=>{ lines.push(`${cond? '✅':'❌'} ${name}`); console.assert(cond, name); };
+
+      // 1) 옵션 개수
+      ok('S1 길이=93', slot1Options.length===93);
+      ok('S2 길이=95', slot2Options.length===95);
+      ok('S3 길이=109', slot3Options.length===109);
+
+      // 2) 비용 매핑
+      ok('비용(잠금0)=1', costOfLocks(0)===1);
+      ok('비용(잠금1)=2', costOfLocks(1)===2);
+      ok('비용(잠금2)=4', costOfLocks(2)===4);
+
+      // 3) randFrom가 유효 인덱스만 반환 (샘플 100회)
+      let inRange=true;
+      for(let i=0;i<100;i++){
+        const a=randFrom(slot1Options); if(!slot1Options.includes(a)) inRange=false;
+      }
+      ok('랜덤 샘플 유효', inRange);
+
+      byId('testOutput').textContent = lines.join('\n');
+    }
+
+    // 실행
+    runTests();
+  </script>
+</body>
+</html>
