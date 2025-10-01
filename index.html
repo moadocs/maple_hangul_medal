@@ -40,15 +40,18 @@
         <legend>목표 세팅</legend>
         <label for="t1">S1 목표</label>
         <select id="t1"><option value="">선택</option></select>
+        <br/>
         <label for="t2">S2 목표</label>
         <select id="t2"><option value="">선택</option></select>
+        <br/>
         <label for="t3">S3 목표</label>
         <select id="t3"><option value="">선택</option></select>
+        <br/>
         <div class="toolbar" style="margin-top:8px">
           <button id="btnAuto">자동 진행 (목표 달성까지)</button>
         </div>
       </fieldset>
-      <details>
+      <details style={{display: "none"}}>
         <summary>진단 / 테스트 보기</summary>
         <pre id="testOutput">(아직 실행 전)</pre>
       </details>
@@ -93,11 +96,11 @@
 
     // ===== select 옵션 채우기 =====
     const t1 = byId('t1');
-    slot1Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t1.appendChild(opt); });
+    slot1Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${txt}`; t1.appendChild(opt); });
     const t2 = byId('t2');
-    slot2Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t2.appendChild(opt); });
+    slot2Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${txt}`; t2.appendChild(opt); });
     const t3 = byId('t3');
-    slot3Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t3.appendChild(opt); });
+    slot3Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${txt}`; t3.appendChild(opt); });
 
     // ===== 상태 =====
     let val1=null, val2=null, val3=null;
