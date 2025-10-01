@@ -92,11 +92,11 @@
 
     // ===== select 옵션 채우기 =====
     const t1 = byId('t1');
-    slot1Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t1.appendChild(opt); });
+    slot1Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${txt}`; t1.appendChild(opt); });
     const t2 = byId('t2');
-    slot2Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t2.appendChild(opt); });
+    slot2Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${txt}`; t2.appendChild(opt); });
     const t3 = byId('t3');
-    slot3Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${i+1}. ${txt}`; t3.appendChild(opt); });
+    slot3Options.forEach((txt, i)=>{ const opt=document.createElement('option'); opt.value=i+1; opt.textContent=`${txt}`; t3.appendChild(opt); });
 
     // ===== 상태 =====
     let val1=null, val2=null, val3=null;
