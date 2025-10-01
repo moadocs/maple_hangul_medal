@@ -91,7 +91,7 @@
     // ===== 유틸 =====
     const $ = (s)=>document.querySelector(s);
     const byId = (id)=>document.getElementById(id);
-    const costOfLocks = (lc)=>([1,2,4][lc] ?? 4);
+    const costOfLocks = (lc)=>([1,2,4][lc] ?? 0);
     const randFrom = (arr)=>arr[Math.floor(Math.random()*arr.length)];
 
     // ===== select 옵션 채우기 =====
